@@ -8,6 +8,7 @@ import { ThemeTokens, DualTheme, GenerationMode, ColorFormat, DesignOptions } fr
 import { generateTheme, extractColorFromImage, formatColor } from './utils/colorUtils';
 import PreviewSection from './components/PreviewSection';
 import SwatchStrip from './components/SwatchStrip';
+import ShareModal from './components/ShareModal';
 
 const MAX_HISTORY = 20;
 
@@ -73,7 +74,9 @@ const App: React.FC = () => {
   const [showOptions, setShowOptions] = useState(false);
   const [isDarkUI, setIsDarkUI] = useState(false);
   const [showSwatches, setShowSwatches] = useState(true);
+
   const [showMobileNotice, setShowMobileNotice] = useState(true);
+  const [showShareModal, setShowShareModal] = useState(false);
   
   const [designOptions, setDesignOptions] = useState<DesignOptions>({
     borderWidth: 1,
@@ -86,8 +89,41 @@ const App: React.FC = () => {
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize
+  // Initialize from URL or History
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlSeed = params.get('seed');
+    const urlMode = params.get('mode') as GenerationMode;
+    
+    if (urlSeed && urlMode) {
+      // Parse Design Options from URL
+      const sat = params.get('sat') ? parseInt(params.get('sat')!) : undefined;
+      const con = params.get('con') ? parseInt(params.get('con')!) : undefined;
+      const bw = params.get('bw') ? parseInt(params.get('bw')!) : undefined;
+      const sh = params.get('sh') ? parseInt(params.get('sh')!) : undefined;
+      const gr = params.get('gr') ? parseInt(params.get('gr')!) : undefined;
+      const rd = params.get('rd') ? parseInt(params.get('rd')!) : undefined;
+
+      // Update options if present
+      setDesignOptions(prev => ({
+        ...prev,
+        borderWidth: bw ?? prev.borderWidth,
+        shadowStrength: sh ?? prev.shadowStrength,
+        gradientLevel: gr ?? prev.gradientLevel,
+        radius: rd ?? prev.radius,
+        contrastLevel: con ?? prev.contrastLevel,
+        saturationLevel: sat ?? prev.saturationLevel
+      }));
+
+      // Generate Theme directly with these params
+      // We pass sat/con explicitly because the state update above might not be flushed yet
+      generateNewTheme(urlMode, urlSeed, sat, con);
+      
+      // Remove encoded params cleanly from URL bar to show pretty URL if desired, 
+      // but we want to KEEP them for sharing.
+      return;
+    }
+
     const saved = localStorage.getItem('theme_history');
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -101,6 +137,23 @@ const App: React.FC = () => {
     generateNewTheme('random');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Sync state to URL
+  useEffect(() => {
+    if (!currentTheme) return;
+    const params = new URLSearchParams();
+    params.set('mode', currentTheme.mode);
+    params.set('seed', currentTheme.seed);
+    params.set('sat', designOptions.saturationLevel.toString());
+    params.set('con', designOptions.contrastLevel.toString());
+    params.set('bw', designOptions.borderWidth.toString());
+    params.set('sh', designOptions.shadowStrength.toString());
+    params.set('gr', designOptions.gradientLevel.toString());
+    params.set('rd', designOptions.radius.toString());
+    
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState(null, '', newUrl);
+  }, [currentTheme, designOptions]);
 
   // Persist history
   useEffect(() => {
@@ -397,6 +450,14 @@ const App: React.FC = () => {
             <Download size={18} />
           </button>
 
+          <button 
+            onClick={() => setShowShareModal(true)} 
+            className="p-1.5 rounded-lg transition-colors hover:bg-white/10"
+            title="Share Theme"
+          >
+            <Share size={18} />
+          </button>
+
           <button
             onClick={() => setIsDarkUI(!isDarkUI)}
             className="p-1.5 rounded-lg transition-colors hover:bg-white/10"
@@ -617,7 +678,14 @@ const App: React.FC = () => {
           </div>
         </div>
 
-      </div>
+        </div>
+      {/* Modals */}
+      <ShareModal 
+        isOpen={showShareModal} 
+        onClose={() => setShowShareModal(false)} 
+        url={window.location.href}
+        theme={isDarkUI ? currentTheme.dark : currentTheme.light}
+      />
     </div>
   );
 };
