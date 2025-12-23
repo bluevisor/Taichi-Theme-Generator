@@ -5,11 +5,11 @@ import {
   Moon, Sun, SlidersHorizontal, ChevronUp, ChevronDown, Shuffle, PanelTopClose, PanelTopOpen
 } from 'lucide-react';
 import { ThemeTokens, DualTheme, GenerationMode, ColorFormat, DesignOptions } from './types';
-import { generateTheme, extractColorFromImage } from './utils/colorUtils';
+import { generateTheme, extractColorFromImage, formatColor } from './utils/colorUtils';
 import PreviewSection from './components/PreviewSection';
 import SwatchStrip from './components/SwatchStrip';
 
-const MAX_HISTORY = 50;
+const MAX_HISTORY = 20;
 
 // CSS Variable Injection Helper
 const getStyleVars = (tokens: ThemeTokens) => {
@@ -43,16 +43,23 @@ const TaichiIcon = ({ size = 24, className = "" }: { size?: number, className?: 
     height={size} 
     viewBox="0 0 24 24" 
     fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
     className={className}
   >
-    <circle cx="12" cy="12" r="10" />
-    <path d="M12 2a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 0-5 5 5 5 0 0 0 5 5" />
-    <circle cx="12" cy="7" r="1" fill="currentColor" />
-    <circle cx="12" cy="17" r="1" fill="currentColor" />
+    {/* Outer circle */}
+    <circle cx="12" cy="12" r="10" fill="white" stroke="none" />
+    
+    {/* Dark half with S-curve */}
+    <path 
+      d="M12 2 A10 10 0 0 1 12 22 A5 5 0 0 1 12 12 A5 5 0 0 0 12 2" 
+      fill="black" 
+      stroke="none"
+    />
+    
+    {/* Light eye (in dark half) - positioned like a fish eye */}
+    <circle cx="15" cy="7" r="1.8" fill="white" stroke="none" />
+    
+    {/* Dark eye (in light half) - positioned like a fish eye */}
+    <circle cx="9" cy="17" r="1.8" fill="black" stroke="none" />
   </svg>
 );
 
@@ -72,7 +79,7 @@ const App: React.FC = () => {
     shadowStrength: 2,
     gradientLevel: 0,
     radius: 3,
-    contrastLevel: 2, // Default to Middle (scale 0-4)
+    contrastLevel: 3, // Default to Middle (scale 1-5)
     saturationLevel: 2 // Default to Middle (scale 0-4)
   });
   
@@ -121,11 +128,16 @@ const App: React.FC = () => {
     };
 
     setHistory(prev => {
-      const newHist = [...prev.slice(0, historyIndex + 1), newTheme];
-      if (newHist.length > MAX_HISTORY) newHist.shift();
+      // Add new theme to the beginning (left side)
+      const newHist = [newTheme, ...prev];
+      // Keep only the most recent MAX_HISTORY items (FIFO - remove from right)
+      if (newHist.length > MAX_HISTORY) {
+        return newHist.slice(0, MAX_HISTORY);
+      }
       return newHist;
     });
-    setHistoryIndex(prev => Math.min(prev + 1, MAX_HISTORY - 1));
+    // New items are always at index 0
+    setHistoryIndex(0);
     setCurrentTheme(newTheme);
   }, [historyIndex, designOptions.saturationLevel, designOptions.contrastLevel]);
 
@@ -198,11 +210,31 @@ const App: React.FC = () => {
 
   const exportTheme = () => {
      if (!currentTheme) return;
-     const blob = new Blob([JSON.stringify(currentTheme, null, 2)], { type: 'application/json' });
+     
+     // Convert theme colors to the current format
+     const formatTheme = (tokens: ThemeTokens) => {
+       const formatted: any = {};
+       Object.entries(tokens).forEach(([key, hex]) => {
+         formatted[key] = formatColor(hex, format);
+       });
+       return formatted;
+     };
+     
+     const exportData = {
+       id: currentTheme.id,
+       timestamp: currentTheme.timestamp,
+       seed: currentTheme.seed,
+       mode: currentTheme.mode,
+       format: format,
+       light: formatTheme(currentTheme.light),
+       dark: formatTheme(currentTheme.dark)
+     };
+     
+     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
      const url = URL.createObjectURL(blob);
      const a = document.createElement('a');
      a.href = url;
-     a.download = `theme-${currentTheme.seed.replace('#','')}.json`;
+     a.download = `theme-${currentTheme.seed.replace('#','')}-${format}.json`;
      a.click();
   };
 
@@ -220,15 +252,7 @@ const App: React.FC = () => {
     }
   };
   
-  // Collapse logic for the global toggle
-  const toggleCollapse = () => {
-      if (showSwatches || showOptions) {
-          setShowSwatches(false);
-          setShowOptions(false);
-      } else {
-          setShowSwatches(true);
-      }
-  };
+
 
   if (!currentTheme) return <div className="h-screen flex items-center justify-center bg-gray-900 text-white">Loading...</div>;
 
@@ -262,8 +286,8 @@ const App: React.FC = () => {
       >
         <div className="flex items-center gap-4 overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-2 shrink-0">
-             <div className="w-8 h-8 rounded-lg shadow-sm flex items-center justify-center text-white" style={{ background: `linear-gradient(135deg, ${shellTheme.primary}, ${shellTheme.accent})`}}>
-                <TaichiIcon size={18} />
+             <div className="w-8 h-8 rounded-lg shadow-sm flex items-center justify-center" style={{ backgroundColor: shellTheme.primary }}>
+                <TaichiIcon size={24} />
              </div>
              <h1 className="font-bold text-lg hidden md:block">Taichi Color Generator</h1>
           </div>
@@ -330,6 +354,15 @@ const App: React.FC = () => {
           <div className="h-6 w-px mx-1 bg-current opacity-20"></div>
 
           <button 
+             onClick={() => setShowSwatches(!showSwatches)} 
+             className={`p-1.5 rounded-lg transition-colors ${showSwatches ? 'bg-current text-white/90' : 'hover:bg-white/10'}`}
+             style={showSwatches ? { backgroundColor: shellTheme.primary, color: shellTheme.primaryFg } : {}}
+             title="Color Palette"
+          >
+            <Palette size={18} />
+          </button>
+
+          <button 
              onClick={() => setShowOptions(!showOptions)} 
              className={`p-1.5 rounded-lg transition-colors ${showOptions ? 'bg-current text-white/90' : 'hover:bg-white/10'}`}
              style={showOptions ? { backgroundColor: shellTheme.primary, color: shellTheme.primaryFg } : {}}
@@ -372,15 +405,7 @@ const App: React.FC = () => {
             {isDarkUI ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          <div className="h-6 w-px mx-1 bg-current opacity-20"></div>
-          
-          <button
-             onClick={toggleCollapse}
-             className={`p-1.5 rounded-lg transition-colors hover:bg-white/10 ${(!showSwatches && !showOptions) ? 'opacity-50' : ''}`}
-             title={showSwatches || showOptions ? "Collapse All Panels" : "Show Panels"}
-          >
-            {showSwatches || showOptions ? <PanelTopClose size={18} /> : <PanelTopOpen size={18} />}
-          </button>
+
         </div>
       </header>
 
@@ -487,7 +512,7 @@ const App: React.FC = () => {
                <span className="text-xs font-mono opacity-50">Lvl {designOptions.contrastLevel}</span>
              </div>
              <input 
-               type="range" min="0" max="4" step="1"
+               type="range" min="1" max="5" step="1"
                value={designOptions.contrastLevel}
                onChange={(e) => updateOption('contrastLevel', parseInt(e.target.value))}
                className="w-full h-1.5 bg-current opacity-20 rounded-lg appearance-none cursor-pointer accent-current"

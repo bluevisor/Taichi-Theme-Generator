@@ -104,14 +104,14 @@ export function formatColor(hex: string, format: ColorFormat): string {
     if (format === 'hex') return hex.toUpperCase();
     if (format === 'rgb') {
         const {r,g,b} = hexToRgb(hex);
-        return `${r}, ${g}, ${b}`;
+        return `rgb(${r}, ${g}, ${b})`;
     }
     if (format === 'hsl') {
         const {h,s,l} = hexToHsl(hex);
-        return `${h}, ${s}%, ${l}%`;
+        return `hsl(${h}, ${s}%, ${l}%)`;
     }
     if (format === 'oklch') {
-        return hexToOklchRaw(hex);
+        return `oklch(${hexToOklchRaw(hex)})`;
     }
     return hex;
 }
@@ -207,21 +207,21 @@ export function generateTheme(
     seedVal = getSeedValue(tempSeed);
     
     // Saturation Logic (Base randomness)
-    // 0: 5-20%
-    // 1: 20-40%
-    // 2: 40-60%
-    // 3: 60-80%
-    // 4: 80-100%
+    // 0: 0% (pure grayscale)
+    // 1: 15-25% (low saturation, more visible color)
+    // 2: 40-50% (medium saturation)
+    // 3: 65-75% (high saturation)
+    // 4: 90-100% (maximum saturation)
     const satRandom = seededRandom(seedVal + 1);
     
     if (mode === 'random') {
         switch(saturationLevel) {
-            case 0: baseSat = Math.floor(satRandom * 15) + 5; break;
-            case 1: baseSat = Math.floor(satRandom * 20) + 20; break;
-            case 2: baseSat = Math.floor(satRandom * 20) + 40; break;
-            case 3: baseSat = Math.floor(satRandom * 20) + 60; break;
-            case 4: baseSat = Math.floor(satRandom * 20) + 80; break;
-            default: baseSat = Math.floor(satRandom * 20) + 40;
+            case 0: baseSat = 0; break; // Pure grayscale
+            case 1: baseSat = Math.floor(satRandom * 10) + 15; break; // Low saturation
+            case 2: baseSat = Math.floor(satRandom * 10) + 40; break; // Medium
+            case 3: baseSat = Math.floor(satRandom * 10) + 65; break; // High
+            case 4: baseSat = Math.floor(satRandom * 10) + 90; break; // Maximum
+            default: baseSat = Math.floor(satRandom * 10) + 40;
         }
     }
   }
@@ -239,50 +239,55 @@ export function generateTheme(
 
   // Adjust Primary Saturation based on level (Clamping)
   // Ensure the primary color follows the slider intent strongly
+  // Equal spacing: 0, 15-25, 40-50, 65-75, 90-100
   let primarySat = baseSat;
-  const sMin = [0, 20, 40, 60, 80][saturationLevel];
-  const sMax = [20, 40, 60, 80, 100][saturationLevel];
+  const sMin = [0, 15, 40, 65, 90][saturationLevel];
+  const sMax = [0, 25, 50, 75, 100][saturationLevel];
   primarySat = clamp(baseSat, sMin, sMax);
 
   let secondarySat = mode === 'monochrome' ? clamp(baseSat - 30, 0, sMax - 20) : clamp(baseSat - 10, sMin, sMax);
-  let accentSat = mode === 'monochrome' ? clamp(baseSat + 10, sMin, 100) : clamp(baseSat + 10, sMin, 100);
+  let accentSat = mode === 'monochrome' ? clamp(baseSat + 10, sMin, sMax) : clamp(baseSat + 10, sMin, sMax);
 
   // --- Dynamic Range (Contrast) Logic ---
-  // 5 Levels equidistant mapping for Lightness
-  // Level 0: Softest | Light BG: 88, Light Text: 35 | Dark BG: 25, Dark Text: 70
-  // Level 1: Soft    | Light BG: 92, Light Text: 25 | Dark BG: 18, Dark Text: 80
-  // Level 2: Middle  | Light BG: 96, Light Text: 15 | Dark BG: 10, Dark Text: 90
-  // Level 3: High    | Light BG: 98, Light Text: 5  | Dark BG: 4,  Dark Text: 95
-  // Level 4: Max     | Light BG: 100,Light Text: 0  | Dark BG: 0,  Dark Text: 100
+  // 5 Levels (1-5) with more dramatic differences for better visual distinction
+  // Adjusted to ensure text is always readable, even at lowest levels
+  // Level 1: Softest | Light BG: 85, Light Text: 30 | Dark BG: 30, Dark Text: 75
+  // Level 2: Soft    | Light BG: 90, Light Text: 20 | Dark BG: 20, Dark Text: 82
+  // Level 3: Middle  | Light BG: 95, Light Text: 18 | Dark BG: 12, Dark Text: 88
+  // Level 4: High    | Light BG: 98, Light Text: 8  | Dark BG: 5,  Dark Text: 94
+  // Level 5: Max     | Light BG: 100,Light Text: 0  | Dark BG: 0,  Dark Text: 100
   
-  const lightBgLevels   = [88, 92, 96, 98, 100];
-  const lightTextLevels = [35, 25, 15, 5, 0];
-  const darkBgLevels    = [25, 18, 10, 4, 0];
-  const darkTextLevels  = [70, 80, 90, 95, 100];
+  // Adjust contrast level to 0-4 index (user sees 1-5)
+  const contrastIndex = contrastLevel - 1;
+  
+  const lightBgLevels   = [85, 90, 95, 98, 100];
+  const lightTextLevels = [30, 20, 18, 8, 0];
+  const darkBgLevels    = [30, 20, 12, 5, 0];
+  const darkTextLevels  = [75, 82, 88, 94, 100];
   
   // Base Color Lightness Modifiers (how "poppy" the colors are against bg)
   // Lower contrast = lighter colors in light mode to blend more, darker in dark mode
-  const lightColorModLevels = [55, 52, 50, 48, 45]; 
-  const darkColorModLevels  = [50, 55, 60, 65, 70];
+  const lightColorModLevels = [58, 54, 50, 46, 42]; 
+  const darkColorModLevels  = [48, 54, 60, 66, 72];
 
   // Random variance to background saturation if tinted
   const rnd = seededRandom(seedVal + 4);
   const isTinted = rnd > 0.5 && saturationLevel > 0;
   const bgSat = isTinted ? Math.floor(seededRandom(seedVal + 5) * (saturationLevel * 3)) : Math.floor(seededRandom(seedVal + 5) * 3);
 
-  const lightBgL = lightBgLevels[contrastLevel];
-  const lightTextL = lightTextLevels[contrastLevel];
-  const darkBgL = darkBgLevels[contrastLevel];
-  const darkTextL = darkTextLevels[contrastLevel];
+  const lightBgL = lightBgLevels[contrastIndex];
+  const lightTextL = lightTextLevels[contrastIndex];
+  const darkBgL = darkBgLevels[contrastIndex];
+  const darkTextL = darkTextLevels[contrastIndex];
   
-  const lightColorMod = lightColorModLevels[contrastLevel];
-  const darkColorMod = darkColorModLevels[contrastLevel];
+  const lightColorMod = lightColorModLevels[contrastIndex];
+  const darkColorMod = darkColorModLevels[contrastIndex];
 
   // Surface Logic
   // Light mode: Surface is slightly lighter or darker than BG depending on contrast
   // Dark mode: Surface is lighter than BG
-  const lightSurfL = contrastLevel >= 3 ? 100 : lightBgL + (contrastLevel === 0 ? 5 : 3);
-  const darkSurfL = darkBgL + (contrastLevel === 0 ? 5 : (contrastLevel === 4 ? 12 : 8)); 
+  const lightSurfL = contrastIndex >= 3 ? 100 : Math.min(100, lightBgL + (contrastIndex === 0 ? 6 : 4));
+  const darkSurfL = Math.min(100, darkBgL + (contrastIndex === 0 ? 8 : (contrastIndex === 4 ? 15 : 10))); 
 
   // Generate Tokens
   const light: ThemeTokens = {
@@ -307,9 +312,13 @@ export function generateTheme(
     border: hslToHex(primaryHue, 10, lightBgL - 10),
     ring: hslToHex(primaryHue, 60, 60),
     
-    success: '#10b981', successFg: '#ffffff',
-    warn: '#f59e0b', warnFg: '#ffffff',
-    error: '#ef4444', errorFg: '#ffffff'
+    // Success, warn, error now follow saturation slider
+    success: hslToHex(142, clamp(primarySat, sMin, sMax), 45), // Green hue
+    successFg: '#ffffff',
+    warn: hslToHex(38, clamp(primarySat, sMin, sMax), 50), // Orange hue
+    warnFg: '#ffffff',
+    error: hslToHex(0, clamp(primarySat, sMin, sMax), 55), // Red hue
+    errorFg: '#ffffff'
   };
 
   const dark: ThemeTokens = {
@@ -331,9 +340,13 @@ export function generateTheme(
     border: hslToHex(primaryHue, 15, darkBgL + 12),
     ring: hslToHex(primaryHue, 60, 60),
     
-    success: '#059669', successFg: '#ffffff',
-    warn: '#d97706', warnFg: '#ffffff',
-    error: '#dc2626', errorFg: '#ffffff'
+    // Success, warn, error now follow saturation slider
+    success: hslToHex(142, clamp(primarySat, sMin, sMax), 40), // Green hue (darker for dark mode)
+    successFg: '#ffffff',
+    warn: hslToHex(38, clamp(primarySat, sMin, sMax), 45), // Orange hue (darker for dark mode)
+    warnFg: '#ffffff',
+    error: hslToHex(0, clamp(primarySat, sMin, sMax), 50), // Red hue (darker for dark mode)
+    errorFg: '#ffffff'
   };
 
   return { light, dark, seed: seedColor || hslToHex(baseHue, baseSat, 50) };

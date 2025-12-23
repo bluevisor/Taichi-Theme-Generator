@@ -117,11 +117,21 @@ const SwatchRow: React.FC<SwatchRowProps> = ({ hex, format, isDarkUI, onCopy, co
 
   return (
     <div className={`flex items-center p-2 gap-2 ${bgHover} transition-colors group relative`}>
-      {/* Clickable Swatch */}
+      {/* Clickable Swatch with background pattern */}
       <button 
         onClick={onCopy}
-        className="w-10 h-10 rounded-lg shadow-sm border border-gray-200/20 shrink-0 cursor-pointer hover:scale-105 active:scale-95 transition-transform relative overflow-hidden" 
-        style={{ backgroundColor: hex }}
+        className="w-12 h-12 rounded-lg shadow-md border-2 border-gray-300/40 shrink-0 cursor-pointer hover:scale-105 active:scale-95 transition-transform relative overflow-hidden" 
+        style={{ 
+          backgroundColor: hex,
+          backgroundImage: `
+            linear-gradient(45deg, rgba(0,0,0,0.05) 25%, transparent 25%),
+            linear-gradient(-45deg, rgba(0,0,0,0.05) 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.05) 75%),
+            linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.05) 75%)
+          `,
+          backgroundSize: '8px 8px',
+          backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px'
+        }}
         title="Click to copy color"
       >
         {copied && (
@@ -160,13 +170,13 @@ const SwatchRow: React.FC<SwatchRowProps> = ({ hex, format, isDarkUI, onCopy, co
 const SwatchStrip: React.FC<SwatchStripProps> = ({ light, dark, format, isDarkUI, onUpdate }) => {
   const bg = isDarkUI ? 'bg-slate-900/95 border-slate-700' : 'bg-white/95 border-gray-200';
   
-  // Map token keys we want to display
-  const tokens = ['bg', 'surface', 'text', 'primary', 'secondary', 'accent'];
+  // Map token keys we want to display - now 8 colors
+  const tokens = ['bg', 'surface', 'text', 'primary', 'secondary', 'accent', 'success', 'error'];
 
   return (
     <div className={`sticky top-0 z-40 backdrop-blur-md border-b p-2 shadow-sm transition-colors duration-300 ${bg}`}>
       <div className="max-w-[1920px] mx-auto w-full">
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 w-full">
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-2 w-full">
           {tokens.map(key => (
             <TokenBlock 
               key={key}
