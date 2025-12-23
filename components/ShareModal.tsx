@@ -90,7 +90,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, url, theme }) 
               value={url} 
               size={280} 
               level="M" 
-              includeMargin={false}
+              includeMargin={true}
               imageSettings={{
                 src: "/favicon.svg", 
                 x: undefined,
