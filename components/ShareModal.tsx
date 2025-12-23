@@ -27,7 +27,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, url, theme }) 
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const shareText = "Check out this color theme I generated with Taichi!";
+  const shareText = "Check out this color theme I generated with Taichi Theme Generator!";
   const encodedUrl = encodeURIComponent(url);
   const encodedText = encodeURIComponent(shareText);
 

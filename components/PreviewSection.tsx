@@ -236,7 +236,7 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options }) => {
           {themeName} Theme Preview
         </div>
         <h1 className="text-5xl font-extrabold tracking-tight text-t-text">
-          Color Palette <span className={textGradient}>Generator</span>
+          Taichi Theme <span className={textGradient}>Generator</span>
         </h1>
         <p className="text-xl text-t-muted max-w-lg leading-relaxed">
           Create beautiful light and dark theme color schemes instantly. 
