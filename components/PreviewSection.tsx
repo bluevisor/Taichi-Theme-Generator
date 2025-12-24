@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Bell, Check, X, AlertTriangle, Info, Search, Menu, ChevronRight, 
-  Settings, User, Lock, Mail, Upload, Home, BarChart2, 
+  Settings, User, Lock, Mail, Upload, Home, BarChart2, DollarSign,
   Twitter, Github, Facebook, Layers
 } from 'lucide-react';
 import { ThemeTokens, DesignOptions } from '../types';
