@@ -20,6 +20,7 @@ const getStyleVars = (tokens: ThemeTokens) => {
     '--card2': tokens.card2,
     '--text': tokens.text,
     '--text-muted': tokens.textMuted,
+    '--text-on-color': tokens.textOnColor,
     '--primary': tokens.primary,
     '--primary-fg': tokens.primaryFg,
     '--secondary': tokens.secondary,
