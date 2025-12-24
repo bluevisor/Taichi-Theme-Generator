@@ -312,15 +312,15 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options }) => {
 
           {/* Secondary Button */}
           <button className={`${secondaryBg} px-5 py-2.5 ${rPill} font-semibold ${bAction} ${sClass} transition-all duration-300 
-            hover:brightness-95 hover:shadow-sm hover:${sClassHover}
-            active:scale-95 active:brightness-90 focus:ring-4 focus:ring-t-secondary/30`}>
+            hover:${sClassHover} hover:-translate-y-0.5 hover:brightness-110
+            active:translate-y-0 active:scale-95 active:shadow-none focus:ring-4 focus:ring-t-secondary/30`}>
             Secondary
           </button>
 
           {/* Accent Button */}
           <button className={`${accentBg} px-5 py-2.5 ${rPill} font-semibold ${bAction} ${sClass} transition-all duration-300 
-            hover:brightness-95 hover:shadow-sm hover:${sClassHover}
-            active:scale-95 active:brightness-90 focus:ring-4 focus:ring-t-accent/30`}>
+            hover:${sClassHover} hover:-translate-y-0.5 hover:brightness-110
+            active:translate-y-0 active:scale-95 active:shadow-none focus:ring-4 focus:ring-t-accent/30`}>
             Accent
           </button>
 
