@@ -1,25 +1,19 @@
+import { ThemeTokens, GenerationMode } from '../types';
+
 /**
- * API Client for Taichi Color Generator
+ * API Client for Taichi Theme Generator
  * 
  * This file provides helper functions to interact with the API endpoints.
  * Use these functions in your React components to generate and export themes.
  */
 
 // Configuration
-const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://your-domain.vercel.app/api' 
-  : '/api';
+// Using absolute URL if specified in env, otherwise fallback to relative /api
+const API_BASE_URL = typeof window !== 'undefined' && window.location.origin.includes('localhost')
+  ? '/api'
+  : (import.meta.env.VITE_API_URL || '/api');
 
-export interface Theme {
-  primary: string;
-  secondary: string;
-  accent: string;
-  background: string;
-  surface: string;
-  text: string;
-  textSecondary: string;
-  border: string;
-}
+export type Theme = ThemeTokens;
 
 export interface ThemeMetadata {
   style: string;
@@ -46,7 +40,7 @@ export interface ExportThemeResponse {
   retryAfter?: number;
 }
 
-export type ThemeStyle = 'yin-yang' | 'five-elements' | 'bagua' | 'random';
+export type ThemeStyle = GenerationMode;
 export type ExportFormat = 'css' | 'scss' | 'less' | 'tailwind' | 'json';
 
 /**

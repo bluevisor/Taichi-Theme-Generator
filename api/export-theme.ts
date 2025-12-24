@@ -172,7 +172,7 @@ function exportAsCSS(theme: Record<string, string>, prefix: string, includeComme
   
   if (includeComments) {
     lines.push('/**');
-    lines.push(' * Taichi Color Generator - Theme Export');
+    lines.push(' * Taichi Theme Generator - Theme Export');
     lines.push(` * Generated: ${new Date().toISOString()}`);
     lines.push(' * Format: CSS Custom Properties');
     lines.push(' */\n');
@@ -202,7 +202,7 @@ function exportAsSCSS(theme: Record<string, string>, prefix: string, includeComm
   
   if (includeComments) {
     lines.push('//');
-    lines.push('// Taichi Color Generator - Theme Export');
+    lines.push('// Taichi Theme Generator - Theme Export');
     lines.push(`// Generated: ${new Date().toISOString()}`);
     lines.push('// Format: SCSS Variables');
     lines.push('//\n');
@@ -227,7 +227,7 @@ function exportAsLESS(theme: Record<string, string>, prefix: string, includeComm
   
   if (includeComments) {
     lines.push('//');
-    lines.push('// Taichi Color Generator - Theme Export');
+    lines.push('// Taichi Theme Generator - Theme Export');
     lines.push(`// Generated: ${new Date().toISOString()}`);
     lines.push('// Format: LESS Variables');
     lines.push('//\n');
@@ -252,7 +252,7 @@ function exportAsTailwind(theme: Record<string, string>, includeComments: boolea
   
   if (includeComments) {
     lines.push('/**');
-    lines.push(' * Taichi Color Generator - Theme Export');
+    lines.push(' * Taichi Theme Generator - Theme Export');
     lines.push(` * Generated: ${new Date().toISOString()}`);
     lines.push(' * Format: Tailwind CSS Configuration');
     lines.push(' */\n');

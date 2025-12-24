@@ -64,8 +64,8 @@ Visit [taichi.bucaastudio.com](https://taichi.bucaastudio.com) to try it out!
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/bluevisor/Taichi-Color-Generator.git
-   cd Taichi-Color-Generator
+   git clone https://github.com/bluevisor/Taichi-Theme-Generator.git
+   cd Taichi-Theme-Generator
    ```
 
 2. **Install dependencies**
@@ -140,7 +140,7 @@ The generator creates comprehensive design tokens:
 
 ## API Documentation
 
-The Taichi Color Generator provides REST API endpoints for programmatic theme
+The Taichi Theme Generator provides REST API endpoints for programmatic theme
 generation and export.
 
 ### Quick Start

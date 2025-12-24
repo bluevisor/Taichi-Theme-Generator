@@ -1,8 +1,8 @@
-# Taichi Color Generator API Documentation
+# Taichi Theme Generator API Documentation
 
 ## Overview
 
-The Taichi Color Generator API provides endpoints for generating, managing, and
+The Taichi Theme Generator API provides endpoints for generating, managing, and
 exporting Taichi-inspired color themes. All endpoints are rate-limited to ensure
 fair usage on Vercel's free tier.
 

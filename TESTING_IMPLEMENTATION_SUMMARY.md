@@ -2,7 +2,7 @@
 
 ## 🎯 Overview
 
-Comprehensive test suite for all Taichi Color Generator API endpoints, including
+Comprehensive test suite for all Taichi Theme Generator API endpoints, including
 both automated (Jest) and manual testing capabilities.
 
 ## 📦 What Was Created

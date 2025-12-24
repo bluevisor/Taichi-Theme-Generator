@@ -39,7 +39,7 @@ async function rateLimit(req: VercelRequest, max: number, windowMs: number) {
  * 
  * Request Body (JSON):
  * {
- *   "style": "yin-yang" | "five-elements" | "bagua" | "random",
+ *   "style": "random" | "monochrome" | "analogous" | "complementary" | "split-complementary" | "triadic" | "tetradic" | "compound" | "triadic-split",
  *   "baseColor": string (optional, hex color like "#FF5733"),
  *   "lockedColors": string[] (optional, array of color token names to preserve)
  * }
@@ -48,14 +48,28 @@ async function rateLimit(req: VercelRequest, max: number, windowMs: number) {
  * {
  *   "success": true,
  *   "theme": {
- *     "primary": string,
- *     "secondary": string,
- *     "accent": string,
- *     "background": string,
+ *   "theme": {
+ *     "bg": string,
  *     "card": string,
+ *     "card2": string,
  *     "text": string,
- *     "textSecondary": string,
- *     "border": string
+ *     "textMuted": string,
+ *     "textOnColor": string,
+ *     "primary": string,
+ *     "primaryFg": string,
+ *     "secondary": string,
+ *     "secondaryFg": string,
+ *     "accent": string,
+ *     "accentFg": string,
+ *     "border": string,
+ *     "ring": string,
+ *     "good": string,
+ *     "goodFg": string,
+ *     "warn": string,
+ *     "warnFg": string,
+ *     "bad": string,
+ *     "badFg": string
+ *   },
  *   },
  *   "metadata": {
  *     "style": string,
@@ -113,7 +127,10 @@ export default async function handler(
     const { style = 'random', baseColor, lockedColors = [] } = req.body || {};
 
     // Validate style parameter
-    const validStyles = ['yin-yang', 'five-elements', 'bagua', 'random'];
+    const validStyles = [
+      'monochrome', 'analogous', 'complementary', 'split-complementary', 
+      'triadic', 'tetradic', 'compound', 'triadic-split', 'random'
+    ];
     if (!validStyles.includes(style)) {
       return res.status(400).json({
         success: false,
@@ -141,7 +158,7 @@ export default async function handler(
       metadata: {
         style,
         timestamp: Date.now(),
-        philosophy
+        philosophy: philosophy || 'Balanced and harmonious design tokens.'
       }
     });
 
@@ -163,14 +180,9 @@ function generateTheme(
 ): Record<string, string> {
   const theme: Record<string, string> = {};
   const colorTokens = [
-    'primary',
-    'secondary',
-    'accent',
-    'background',
-    'card',
-    'text',
-    'textSecondary',
-    'border'
+    'bg', 'card', 'card2', 'text', 'textMuted', 'textOnColor',
+    'primary', 'primaryFg', 'secondary', 'secondaryFg', 'accent', 'accentFg',
+    'border', 'ring', 'good', 'goodFg', 'warn', 'warnFg', 'bad', 'badFg'
   ];
 
   // Generate colors based on style

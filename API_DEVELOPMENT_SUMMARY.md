@@ -6,7 +6,7 @@ Created: December 23, 2025
 
 ## Overview
 
-This branch adds comprehensive REST API endpoints to the Taichi Color Generator,
+This branch adds comprehensive REST API endpoints to the Taichi Theme Generator,
 enabling programmatic access to theme generation and export functionality. All
 endpoints are optimized for Vercel's free tier with appropriate rate limiting.
 
@@ -129,7 +129,7 @@ All APIs are designed for easy LLM integration:
 ## File Structure
 
 ```
-Taichi-Color-Generator/
+Taichi-Theme-Generator/
 ├── api/
 │   ├── generate-theme.ts       # Theme generation endpoint
 │   ├── export-theme.ts         # Theme export endpoint
