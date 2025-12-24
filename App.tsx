@@ -220,10 +220,13 @@ const App: React.FC = () => {
     const mergedDark = { ...dark };
     
     // Map of token to its related tokens that should also be locked
+    // Map of token to its related tokens that should also be locked
+    // This ensures that when a "master" token is locked, its dependent tokens 
+    // stay harmonious with it (preventing broken contrast or hue mismatches)
     const relatedTokens: Record<string, string[]> = {
-      bg: [],
+      bg: ['surface', 'surface2'], // Surface usually depends on BG context
       surface: ['surface2'],
-      text: [],
+      text: ['textMuted', 'border'], // Typography hierarchy and borders should match text
       textMuted: [],
       textOnColor: [],  // Always white, but lockable
       primary: ['primaryFg', 'ring'],

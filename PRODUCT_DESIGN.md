@@ -471,10 +471,7 @@ The application state is encoded in URL parameters for sharing:
 
 ## Known Issues / TODOs
 
-1. **Color Locking**: When a base color is locked, related tokens should also be
-   preserved.
-
-2. **Mobile Experience**: Preview sections are constrained on mobile; recommend
+1. **Mobile Experience**: Preview sections are constrained on mobile; recommend
    landscape or tablet.
 
 ---
