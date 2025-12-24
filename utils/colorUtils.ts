@@ -552,8 +552,10 @@ export function generateTheme(
     textMuted: hslToHex(primaryHue, 10, applyBrightness(lightTextL + 30, brightnessLevel)),
     // textOnColor: High lightness, but saturation follows slider. 
     // If contrast is low (-5), reduce lightness slightly to be softer? No, usually text on color needs high contrast.
-    // We'll scale saturation with the level (0-10 index mapped to 0-30 tint)
-    textOnColor: hslToHex(primaryHue, Math.max(0, (saturationLevel + 5) * 2), 98), 
+    // Dynamic textOnColor: Flip to dark if primary is too light
+    textOnColor: applyBrightness(lightColorMod, brightnessLevel) > 65 
+      ? hslToHex(primaryHue, Math.max(0, (saturationLevel + 5) * 2), 10) // Dark text for light buttons
+      : hslToHex(primaryHue, Math.max(0, (saturationLevel + 5) * 2), 98), // Light text for dark buttons
     
     primary: hslToHex(primaryHue, primarySat, applyBrightness(lightColorMod, brightnessLevel)), 
     primaryFg: '#ffffff', 
@@ -586,7 +588,10 @@ export function generateTheme(
     card2: hslToHex(primaryHue, bgSat, applyBrightness(darkSurfL + 5, brightnessLevel)),
     text: hslToHex(primaryHue, 10, applyBrightness(darkTextL, brightnessLevel)),
     textMuted: hslToHex(primaryHue, 10, applyBrightness(darkTextL - 30, brightnessLevel)),
-    textOnColor: hslToHex(primaryHue, Math.max(0, (saturationLevel + 5) * 2), 98),
+    // Dynamic textOnColor: Flip to dark if primary is too light (rare in dark mode but possible at max brightness)
+    textOnColor: applyBrightness(darkColorMod, brightnessLevel) > 65
+      ? hslToHex(primaryHue, Math.max(0, (saturationLevel + 5) * 2), 10)
+      : hslToHex(primaryHue, Math.max(0, (saturationLevel + 5) * 2), 98),
     
     primary: hslToHex(primaryHue, primarySat, applyBrightness(darkColorMod, brightnessLevel)),
     primaryFg: '#ffffff',
