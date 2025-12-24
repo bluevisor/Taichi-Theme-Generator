@@ -224,6 +224,9 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options }) => {
   // We will apply hover:${sHoverSize} and hover:${shadowOpacityClass} manually in the className string to avoid variable expansion issues with the JIT engine if any
   const sClassHover = `${sHoverSize} ${shadowOpacityClass}`;
   
+  // Also apply to Volume Slider and small actions if they use shadows
+  // The volume slider uses sClass passed to it.
+  
   // Gradients
   // 0: None
   // 1: Subtle Top-Bottom
@@ -268,7 +271,7 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options }) => {
     : `text-t-primary`;
 
   return (
-    <div className="p-8 space-y-12 min-h-full flex flex-col">
+    <div className="p-8 space-y-12 min-h-full flex flex-col overflow-x-hidden w-full">
       
       {/* Introduction Typography - Shows: bg, text, primary, secondary, accent, surface */}
       <section className="space-y-4">
