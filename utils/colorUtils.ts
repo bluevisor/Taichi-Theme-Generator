@@ -497,7 +497,7 @@ export function generateTheme(
   // Base Color Lightness Modifiers (how "poppy" the colors are against bg)
   // Modulate based on brightness and contrast
   const baseLightColorMod = 46;
-  const baseDarkColorMod = 60;
+  const baseDarkColorMod = 50; // Lowered from 60 to match light mode's richness (less pastel)
   
   // Shift color lightness based on brightness compression
   const brightnessShift = brightnessLevel * 3; // -15 to +15
