@@ -193,14 +193,37 @@ const App: React.FC = () => {
     const { light, dark, seed: newSeed } = generateTheme(genMode, seed, sLevel, cLevel);
     
     // Preserve locked colors from current theme
+    // Also lock related tokens when a base token is locked
     const mergedLight = { ...light };
     const mergedDark = { ...dark };
+    
+    // Map of token to its related tokens that should also be locked
+    const relatedTokens: Record<string, string[]> = {
+      bg: [],
+      surface: ['surface2'],
+      text: ['textMuted'],
+      primary: ['primaryFg', 'ring'],
+      secondary: ['secondaryFg'],
+      accent: ['accentFg'],
+      success: ['successFg'],
+      error: ['errorFg'],
+      warn: ['warnFg'],
+      border: [],
+    };
     
     if (currentTheme) {
       Object.keys(lockedColors).forEach(key => {
         if (lockedColors[key as keyof ThemeTokens]) {
+          // Lock the main token
           mergedLight[key as keyof ThemeTokens] = currentTheme.light[key as keyof ThemeTokens];
           mergedDark[key as keyof ThemeTokens] = currentTheme.dark[key as keyof ThemeTokens];
+          
+          // Also lock related tokens
+          const related = relatedTokens[key] || [];
+          related.forEach(relatedKey => {
+            mergedLight[relatedKey as keyof ThemeTokens] = currentTheme.light[relatedKey as keyof ThemeTokens];
+            mergedDark[relatedKey as keyof ThemeTokens] = currentTheme.dark[relatedKey as keyof ThemeTokens];
+          });
         }
       });
     }
