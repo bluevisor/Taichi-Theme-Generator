@@ -83,7 +83,7 @@ const HeroBanner: React.FC<{
   return (
     <section className="space-y-4">
       <h3 className="text-sm font-bold uppercase tracking-wider text-t-muted">Display Section</h3>
-      <div className={`relative overflow-hidden ${rClass} ${sClass} ${bClass} aspect-[16/9] flex items-center justify-center p-4 sm:p-8 md:p-12 group transition-all duration-300 hover:${sClassHover} hover:-translate-y-1`}>
+      <div className={`relative overflow-hidden isolate ${rClass} ${sClass} ${bClass} aspect-[16/9] flex items-center justify-center p-4 sm:p-8 md:p-12 group transition-all duration-300 hover:${sClassHover} hover:-translate-y-1`} style={{ willChange: 'transform' }}>
         {/* Real Background Image */}
         <div className="absolute inset-0 transition-transform duration-[3000ms] ease-in-out group-hover:scale-110 group-hover:rotate-1">
           <img 
