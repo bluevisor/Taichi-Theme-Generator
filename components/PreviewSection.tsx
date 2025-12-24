@@ -101,7 +101,7 @@ const HeroBanner: React.FC<{
         </div>
 
         {/* Dynamic Theme Overlay - Fixed to card background */}
-        <div className={`absolute inset-0 ${themeName === 'Dark' ? 'bg-black/80' : 'bg-white/80'} backdrop-blur-[1px] transition-colors duration-500`} />
+        <div className={`absolute inset-0 ${themeName === 'Dark' ? 'bg-black/60' : 'bg-white/60'} backdrop-blur-[1px] transition-colors duration-500`} />
         
 
         
