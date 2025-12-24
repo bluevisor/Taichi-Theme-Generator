@@ -801,14 +801,14 @@ const App: React.FC = () => {
                <span className="text-xs font-mono opacity-50">{designOptions.shadowOpacity}%</span>
              </div>
              <input 
-               type="range" min="0" max="100" step="5"
+               type="range" min="5" max="95" step="5"
                value={designOptions.shadowOpacity}
                onChange={(e) => updateOption('shadowOpacity', parseInt(e.target.value))}
                className="w-full h-1.5 bg-current opacity-20 rounded-lg appearance-none cursor-pointer accent-current"
                style={{ accentColor: shellTheme.primary }}
              />
              <div className="flex justify-between text-[10px] opacity-40 px-0.5">
-               <span>0%</span><span>100%</span>
+               <span>5%</span><span>95%</span>
              </div>
            </div>
 

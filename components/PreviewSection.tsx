@@ -250,7 +250,7 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options }) => {
       
       {/* Introduction Typography - Shows: bg, text, primary, secondary, accent, surface */}
       <section className="space-y-4">
-        <div className={`inline-flex items-center px-3 py-1 ${rFull} text-xs font-medium bg-t-primary/15 text-t-primary border border-t-primary/30`}>
+        <div className={`inline-flex items-center px-3 py-1 ${rFull} text-xs font-medium bg-t-primary/15 text-t-primary ${bClass.replace('border-t-text/20', '')} border-t-primary/30 transition-all duration-300`}>
           {themeName} Theme Preview
         </div>
         <h1 className="text-5xl font-extrabold tracking-tight text-t-text">
@@ -259,13 +259,13 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options }) => {
         <p className="text-xl text-t-textMuted max-w-lg leading-relaxed">
           Create beautiful light and dark theme color schemes instantly. 
           This palette generator uses semantic design system tokens like{' '}
-          <code className={`bg-t-primary/20 text-t-primary px-2 py-0.5 text-base font-bold ${rClassInner} border border-t-primary/30`}>primary</code>,{' '}
-          <code className={`bg-t-secondary/20 text-t-secondary px-2 py-0.5 text-base font-bold ${rClassInner} border border-t-secondary/30`}>secondary</code> and{' '}
-          <code className={`bg-t-accent/20 text-t-accent px-2 py-0.5 text-base font-bold ${rClassInner} border border-t-accent/30`}>accent</code>{' '}
+          <code className={`bg-t-primary/20 text-t-primary px-2 py-0.5 text-base font-bold ${rClassInner} ${bClass.replace('border-t-text/20', '')} border-t-primary/30 transition-all duration-300`}>primary</code>,{' '}
+          <code className={`bg-t-secondary/20 text-t-secondary px-2 py-0.5 text-base font-bold ${rClassInner} ${bClass.replace('border-t-text/20', '')} border-t-secondary/30 transition-all duration-300`}>secondary</code> and{' '}
+          <code className={`bg-t-accent/20 text-t-accent px-2 py-0.5 text-base font-bold ${rClassInner} ${bClass.replace('border-t-text/20', '')} border-t-accent/30 transition-all duration-300`}>accent</code>{' '}
           to build harmonious dual themes.
         </p>
         <p className="text-sm text-t-textMuted mt-16">
-          Press <code className={`bg-t-accent/20 text-t-accent px-2 py-0.5 font-mono font-bold ${rClassInner} border border-t-accent/30`}>Space</code> to generate a new color theme pair.
+          Press <code className={`bg-t-accent/20 text-t-accent px-2 py-0.5 font-mono font-bold ${rClassInner} ${bClass.replace('border-t-text/20', '')} border-t-accent/30 transition-all duration-300`}>Space</code> to generate a new color theme pair.
         </p>
       </section>
 
@@ -403,7 +403,7 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options }) => {
           <div className={`bg-t-card ${bClass} ${rClass} p-6 ${sClass} transition-all duration-300 relative overflow-hidden group hover:${sClassHover} hover:-translate-y-1 ${options.borderWidth > 0 ? 'hover:border-t-primary/30' : ''}`}>
              <div className={`absolute top-0 left-0 w-full h-1 ${primaryBg} group-hover:h-1.5 transition-all`}></div>
              <div className="flex justify-between items-start mb-4">
-               <div className={`p-2 bg-t-secondary/15 ${rClassInner} text-t-secondary group-hover:bg-t-secondary group-hover:${fgOnColor} transition-colors`}>
+               <div className={`p-2 bg-t-secondary/15 ${rClassInner} text-t-secondary group-hover:bg-t-secondary group-hover:text-t-textOnColor transition-colors`}>
                  <BarChart2 size={24} />
                </div>
                <span className={`text-xs font-bold text-t-good bg-t-good/15 px-2 py-1 ${rClassInner} border border-t-good/30`}>+24.5%</span>
@@ -423,11 +423,12 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options }) => {
              <h4 className="text-lg font-bold text-t-text">John Doe</h4>
              <p className="text-t-textMuted text-sm mb-4">Product Designer</p>
              <div className="flex gap-2">
-               <span className={`px-2 py-1 ${rClassInner} text-xs font-medium text-t-secondary bg-t-secondary/15 border border-t-secondary/30 hover:bg-t-secondary hover:${fgOnColor} transition-colors cursor-default`}>UI/UX</span>
-               <span className={`px-2 py-1 ${rClassInner} text-xs font-medium text-t-accent bg-t-accent/15 border border-t-accent/30 hover:bg-t-accent hover:${fgOnColor} transition-colors cursor-default`}>React</span>
+               <span className={`px-2 py-1 ${rClassInner} text-xs font-medium text-t-secondary bg-t-secondary/15 border border-t-secondary/30 hover:bg-t-secondary hover:text-t-textOnColor transition-colors cursor-default`}>UI/UX</span>
+               <span className={`px-2 py-1 ${rClassInner} text-xs font-medium text-t-accent bg-t-accent/15 border border-t-accent/30 hover:bg-t-accent hover:text-t-textOnColor transition-colors cursor-default`}>React</span>
              </div>
-             <button className={`mt-4 w-full py-2 ${rClassInner} border border-t-primary/30 text-t-primary text-sm font-medium transition-all duration-200
-               hover:bg-t-primary hover:${fgOnColor} hover:border-transparent
+             <button className={`mt-4 w-full py-2 ${rClassInner} border border-t-primary/30 text-t-primary text-sm font-medium transition-all duration-300
+               hover:bg-t-primary hover:text-t-textOnColor hover:border-transparent
+               active:scale-95`}>
                active:scale-95`}>
                View Profile
              </button>

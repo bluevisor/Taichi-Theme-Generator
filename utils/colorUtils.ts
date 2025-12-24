@@ -515,7 +515,7 @@ export function generateTheme(
     card2: hslToHex(primaryHue, bgSat, applyBrightness(Math.min(100, lightSurfL - 3), brightnessLevel)),
     text: hslToHex(primaryHue, 10, applyBrightness(lightTextL, brightnessLevel)), 
     textMuted: hslToHex(primaryHue, 10, applyBrightness(lightTextL + 30, brightnessLevel)),
-    textOnColor: '#ffffff', // Always white for colored backgrounds
+    textOnColor: hslToHex(primaryHue, 10, 98), // Almost white, tinted with primary
     
     primary: hslToHex(primaryHue, primarySat, applyBrightness(lightColorMod, brightnessLevel)), 
     primaryFg: '#ffffff', 
@@ -548,7 +548,7 @@ export function generateTheme(
     card2: hslToHex(primaryHue, bgSat, applyBrightness(darkSurfL + 5, brightnessLevel)),
     text: hslToHex(primaryHue, 10, applyBrightness(darkTextL, brightnessLevel)),
     textMuted: hslToHex(primaryHue, 10, applyBrightness(darkTextL - 30, brightnessLevel)),
-    textOnColor: '#ffffff', // Always white for colored backgrounds
+    textOnColor: hslToHex(primaryHue, 10, 98), // Almost white, tinted with primary
     
     primary: hslToHex(primaryHue, primarySat, applyBrightness(darkColorMod, brightnessLevel)),
     primaryFg: '#ffffff',
