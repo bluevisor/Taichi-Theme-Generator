@@ -6,6 +6,53 @@ function clamp(num: number, min: number, max: number) {
   return Math.min(Math.max(num, min), max);
 }
 
+/**
+ * Apply brightness compression to a lightness value.
+ * 
+ * @param lightness - Original lightness value (0-100)
+ * @param brightnessLevel - Brightness level (1-5)
+ *   - 1 (Dim): Compresses toward dark - colors near white shift toward gray
+ *   - 3 (Normal): No change
+ *   - 5 (Bright): Compresses toward bright - colors near black shift toward gray
+ * @returns Adjusted lightness value
+ * 
+ * The shift amount is proportional to distance from center (50):
+ * - Colors at 50% gray: no shift
+ * - Colors near 0% or 100%: maximum shift toward center
+ */
+function applyBrightness(lightness: number, brightnessLevel: number): number {
+  // Level 3 is neutral (no change)
+  if (brightnessLevel === 3) return lightness;
+  
+  // Calculate deviation from center (50)
+  const deviation = lightness - 50;
+  
+  // Compression factor: how much to compress toward 50
+  // Level 1 (dim): compress bright colors down, deviations > 0 get reduced
+  // Level 5 (bright): compress dark colors up, deviations < 0 get reduced
+  const compressionAmount = [0.5, 0.25, 0, 0.25, 0.5][brightnessLevel - 1];
+  
+  if (brightnessLevel < 3) {
+    // Dim mode: compress bright colors toward 50
+    if (deviation > 0) {
+      // Bright colors get compressed
+      return 50 + deviation * (1 - compressionAmount);
+    } else {
+      // Dark colors stay mostly the same (slight compression)
+      return 50 + deviation * (1 - compressionAmount * 0.3);
+    }
+  } else {
+    // Bright mode: compress dark colors toward 50
+    if (deviation < 0) {
+      // Dark colors get compressed up toward 50
+      return 50 + deviation * (1 - compressionAmount);
+    } else {
+      // Bright colors stay mostly the same (slight compression)
+      return 50 + deviation * (1 - compressionAmount * 0.3);
+    }
+  }
+}
+
 // Deterministic random based on a string seed
 function getSeedValue(seed: string): number {
   let hash = 0;
@@ -457,69 +504,68 @@ export function generateTheme(
   const lightSurfL = clamp(lightBgL + lightSurfOffset, 0, 100);
   const darkSurfL = clamp(darkBgL + darkSurfOffset, 0, 100); 
 
-  // Generate Tokens
+  // Generate Tokens with brightness applied to ALL colors
+  // applyBrightness shifts lightness proportionally based on distance from 50% gray
   const light: ThemeTokens = {
-    bg: hslToHex(primaryHue, bgSat, lightBgL), 
-    surface: hslToHex(primaryHue, bgSat, Math.min(100, lightSurfL)),
-    surface2: hslToHex(primaryHue, bgSat, Math.min(100, lightSurfL - 3)), // Surface 2 is usually darker in light mode for depth
-    text: hslToHex(primaryHue, 10, lightTextL), 
-    textMuted: hslToHex(primaryHue, 10, lightTextL + 30),
+    bg: hslToHex(primaryHue, bgSat, applyBrightness(lightBgL, brightnessLevel)), 
+    surface: hslToHex(primaryHue, bgSat, applyBrightness(Math.min(100, lightSurfL), brightnessLevel)),
+    surface2: hslToHex(primaryHue, bgSat, applyBrightness(Math.min(100, lightSurfL - 3), brightnessLevel)),
+    text: hslToHex(primaryHue, 10, applyBrightness(lightTextL, brightnessLevel)), 
+    textMuted: hslToHex(primaryHue, 10, applyBrightness(lightTextL + 30, brightnessLevel)),
     textOnColor: '#ffffff', // Always white for colored backgrounds
     
-    primary: hslToHex(primaryHue, primarySat, lightColorMod), 
+    primary: hslToHex(primaryHue, primarySat, applyBrightness(lightColorMod, brightnessLevel)), 
     primaryFg: '#ffffff', 
     
     // Secondary: distinct color for UI elements in light mode
     secondary: mode === 'monochrome' 
-      ? hslToHex(secondaryHue, 10, Math.min(lightColorMod + 20, 80)) 
-      : hslToHex(secondaryHue, secondarySat, Math.min(lightColorMod + 10, 75)),
+      ? hslToHex(secondaryHue, 10, applyBrightness(Math.min(lightColorMod + 20, 80), brightnessLevel)) 
+      : hslToHex(secondaryHue, secondarySat, applyBrightness(Math.min(lightColorMod + 10, 75), brightnessLevel)),
       
-    secondaryFg: hslToHex(secondaryHue, 40, lightTextL),
+    secondaryFg: hslToHex(secondaryHue, 40, applyBrightness(lightTextL, brightnessLevel)),
     
-    accent: hslToHex(accentHue, accentSat, lightColorMod + 5),
+    accent: hslToHex(accentHue, accentSat, applyBrightness(lightColorMod + 5, brightnessLevel)),
     accentFg: '#ffffff',
     
-    border: hslToHex(primaryHue, 10, lightBgL - 10),
-    ring: hslToHex(primaryHue, 60, 60),
+    border: hslToHex(primaryHue, 10, applyBrightness(lightBgL - 10, brightnessLevel)),
+    ring: hslToHex(primaryHue, 60, applyBrightness(60, brightnessLevel)),
     
-    // Success, warn, error: follow both saturation AND contrast sliders
-    // At low contrast, they blend more with background; at high contrast, they're more distinct
-    success: hslToHex(142, clamp(primarySat, sMin, sMax), Math.max(lightColorMod - 5, 40)), // Green hue
+    // Success, warn, error: follow both saturation AND contrast sliders + brightness
+    success: hslToHex(142, clamp(primarySat, sMin, sMax), applyBrightness(Math.max(lightColorMod - 5, 40), brightnessLevel)),
     successFg: '#ffffff',
-    warn: hslToHex(38, clamp(primarySat, sMin, sMax), Math.max(lightColorMod, 45)), // Orange hue
+    warn: hslToHex(38, clamp(primarySat, sMin, sMax), applyBrightness(Math.max(lightColorMod, 45), brightnessLevel)),
     warnFg: '#ffffff',
-    error: hslToHex(0, clamp(primarySat, sMin, sMax), Math.max(lightColorMod + 5, 50)), // Red hue
+    error: hslToHex(0, clamp(primarySat, sMin, sMax), applyBrightness(Math.max(lightColorMod + 5, 50), brightnessLevel)),
     errorFg: '#ffffff'
   };
 
   const dark: ThemeTokens = {
-    bg: hslToHex(primaryHue, bgSat, darkBgL), 
-    surface: hslToHex(primaryHue, bgSat, darkSurfL), 
-    surface2: hslToHex(primaryHue, bgSat, darkSurfL + 5), // Lighter in dark mode
-    text: hslToHex(primaryHue, 10, darkTextL),
-    textMuted: hslToHex(primaryHue, 10, darkTextL - 30),
+    bg: hslToHex(primaryHue, bgSat, applyBrightness(darkBgL, brightnessLevel)), 
+    surface: hslToHex(primaryHue, bgSat, applyBrightness(darkSurfL, brightnessLevel)), 
+    surface2: hslToHex(primaryHue, bgSat, applyBrightness(darkSurfL + 5, brightnessLevel)),
+    text: hslToHex(primaryHue, 10, applyBrightness(darkTextL, brightnessLevel)),
+    textMuted: hslToHex(primaryHue, 10, applyBrightness(darkTextL - 30, brightnessLevel)),
     textOnColor: '#ffffff', // Always white for colored backgrounds
     
-    primary: hslToHex(primaryHue, primarySat, darkColorMod),
+    primary: hslToHex(primaryHue, primarySat, applyBrightness(darkColorMod, brightnessLevel)),
     primaryFg: '#ffffff',
     
     // Secondary: brighter for better readability in dark mode
-    secondary: hslToHex(secondaryHue, secondarySat, Math.max(darkColorMod - 10, 40)), 
-    secondaryFg: hslToHex(secondaryHue, 40, darkTextL),
+    secondary: hslToHex(secondaryHue, secondarySat, applyBrightness(Math.max(darkColorMod - 10, 40), brightnessLevel)), 
+    secondaryFg: hslToHex(secondaryHue, 40, applyBrightness(darkTextL, brightnessLevel)),
     
-    accent: hslToHex(accentHue, accentSat, darkColorMod + 5),
+    accent: hslToHex(accentHue, accentSat, applyBrightness(darkColorMod + 5, brightnessLevel)),
     accentFg: '#ffffff',
     
-    border: hslToHex(primaryHue, 15, darkBgL + 12),
-    ring: hslToHex(primaryHue, 60, 60),
+    border: hslToHex(primaryHue, 15, applyBrightness(darkBgL + 12, brightnessLevel)),
+    ring: hslToHex(primaryHue, 60, applyBrightness(60, brightnessLevel)),
     
-    // Success, warn, error: follow both saturation AND contrast sliders
-    // At low contrast, they blend more with background; at high contrast, they're more distinct
-    success: hslToHex(142, clamp(primarySat, sMin, sMax), Math.max(darkColorMod - 10, 35)), // Green hue
+    // Success, warn, error: follow both saturation AND contrast sliders + brightness
+    success: hslToHex(142, clamp(primarySat, sMin, sMax), applyBrightness(Math.max(darkColorMod - 10, 35), brightnessLevel)),
     successFg: '#ffffff',
-    warn: hslToHex(38, clamp(primarySat, sMin, sMax), Math.max(darkColorMod - 5, 40)), // Orange hue
+    warn: hslToHex(38, clamp(primarySat, sMin, sMax), applyBrightness(Math.max(darkColorMod - 5, 40), brightnessLevel)),
     warnFg: '#ffffff',
-    error: hslToHex(0, clamp(primarySat, sMin, sMax), Math.max(darkColorMod, 45)), // Red hue
+    error: hslToHex(0, clamp(primarySat, sMin, sMax), applyBrightness(Math.max(darkColorMod, 45), brightnessLevel)),
     errorFg: '#ffffff'
   };
 
