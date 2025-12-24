@@ -106,13 +106,13 @@ const HeroBanner: React.FC<{
           }} 
         />
         
-        {/* Animated shimmer effect on hover */}
+        {/* Animated shimmer effect on hover - plays once */}
         <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:animate-[shimmer_0.6s_ease-out_forwards]"
           style={{
-            background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)`,
+            background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)`,
             backgroundSize: '200% 100%',
-            animation: 'shimmer 2s ease-in-out infinite'
+            backgroundPosition: '-200% 0'
           }}
         />
         <style>{`
