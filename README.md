@@ -11,6 +11,10 @@
 
 </div>
 
+<div align="center">
+  <img src="public/taichi-preview.png" alt="Taichi Theme Generator Preview" width="100%" />
+</div>
+
 ## Features
 
 - **Dual Theme Generation** - Simultaneously generate perfectly matched light
