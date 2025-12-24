@@ -727,7 +727,7 @@ const App: React.FC = () => {
       {/* --- View Options Panel (Sliders) --- */}
       {showOptions && (
         <div 
-          className="border-b p-6 shrink-0 shadow-inner z-40 relative grid grid-cols-2 md:grid-cols-6 gap-8 transition-colors duration-500"
+          className="border-b px-4 py-4 shrink-0 shadow-inner z-40 relative grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-x-4 gap-y-4 transition-colors duration-500"
           style={{ backgroundColor: shellTheme.bg, borderColor: shellTheme.border }}
         >
            {/* Border Width */}
