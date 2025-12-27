@@ -341,8 +341,11 @@ function constructStatusColors(
 
 // --- Dark Mode Derivation ---
 
-function deriveDarkMode(light: ThemeTokens): ThemeTokens {
+function deriveDarkMode(light: ThemeTokens, brightnessLevel: number = 0): ThemeTokens {
   const darkTargets = NEUTRAL_TARGETS.dark;
+  
+  // Positive brightness makes dark mode lighter, negative makes it darker
+  const brightnessMod = brightnessLevel * 0.02;
   
   const lightBg = toOklch(light.bg);
   const lightCard = toOklch(light.card);
@@ -366,13 +369,13 @@ function deriveDarkMode(light: ThemeTokens): ThemeTokens {
     });
   };
   
-  // Neutral tokens with specific dark targets
-  const darkBg = clampToSRGBGamut({ L: darkTargets.bg, C: lightBg.C * 0.5, H: lightBg.H });
-  const darkCard = clampToSRGBGamut({ L: darkTargets.card, C: lightCard.C * 0.5, H: lightCard.H });
-  const darkCard2 = clampToSRGBGamut({ L: darkTargets.card2, C: lightCard2.C * 0.5, H: lightCard2.H });
+  // Neutral tokens with specific dark targets, adjusted by brightness
+  const darkBg = clampToSRGBGamut({ L: Math.max(0.03, Math.min(0.25, darkTargets.bg + brightnessMod)), C: lightBg.C * 0.5, H: lightBg.H });
+  const darkCard = clampToSRGBGamut({ L: Math.max(0.06, Math.min(0.30, darkTargets.card + brightnessMod)), C: lightCard.C * 0.5, H: lightCard.H });
+  const darkCard2 = clampToSRGBGamut({ L: Math.max(0.09, Math.min(0.35, darkTargets.card2 + brightnessMod)), C: lightCard2.C * 0.5, H: lightCard2.H });
   const darkText = clampToSRGBGamut({ L: darkTargets.text, C: lightText.C * 0.3, H: lightText.H });
   const darkTextMuted = clampToSRGBGamut({ L: darkTargets.textMuted, C: lightTextMuted.C * 0.3, H: lightTextMuted.H });
-  const darkBorder = clampToSRGBGamut({ L: darkTargets.border, C: lightBorder.C * 0.5, H: lightBorder.H });
+  const darkBorder = clampToSRGBGamut({ L: Math.max(0.15, Math.min(0.40, darkTargets.border + brightnessMod)), C: lightBorder.C * 0.5, H: lightBorder.H });
   
   // Brand colors - preserve hue, adjust lightness for dark
   const darkPrimary = clampToSRGBGamut({

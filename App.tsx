@@ -108,9 +108,9 @@ const App: React.FC = () => {
     setDesignOptions(prev => {
       const next = { ...prev };
       
-      // Border: 0-5
+      // Border: 0-2 (none, thin, thick)
       if (!lockedOptions.borderWidth) {
-        next.borderWidth = Math.floor(Math.random() * 6);
+        next.borderWidth = Math.floor(Math.random() * 3);
       }
       
       // Shadow Strength: 0-5
@@ -176,10 +176,14 @@ const App: React.FC = () => {
       const sat = params.get('sat') ? parseInt(params.get('sat')!) : undefined;
       const con = params.get('con') ? parseInt(params.get('con')!) : undefined;
       const bri = params.get('bri') ? parseInt(params.get('bri')!) : undefined;
-      const bw = params.get('bw') ? parseInt(params.get('bw')!) : undefined;
+      const bwRaw = params.get('bw') ? parseInt(params.get('bw')!) : undefined;
+      const bw = bwRaw !== undefined ? Math.min(Math.max(bwRaw, 0), 2) : undefined;
       const sh = params.get('sh') ? parseInt(params.get('sh')!) : undefined;
       const so = params.get('so') ? parseInt(params.get('so')!) : undefined;
-      const gr = params.get('gr') ? parseInt(params.get('gr')!) : undefined;
+      const grParam = params.get('gr');
+      const gradients = grParam !== null
+        ? grParam === 'true' || grParam === '1' || parseInt(grParam, 10) > 0
+        : undefined;
       const rd = params.get('rd') ? parseInt(params.get('rd')!) : undefined;
 
       // Update options if present
@@ -188,7 +192,7 @@ const App: React.FC = () => {
         borderWidth: bw ?? prev.borderWidth,
         shadowStrength: sh ?? prev.shadowStrength,
         shadowOpacity: so ?? prev.shadowOpacity,
-        gradientLevel: gr ?? prev.gradientLevel,
+        gradients: gradients ?? prev.gradients,
         radius: rd ?? prev.radius,
         brightnessLevel: bri ?? prev.brightnessLevel,
         contrastLevel: con ?? prev.contrastLevel,
@@ -230,7 +234,7 @@ const App: React.FC = () => {
     params.set('bw', designOptions.borderWidth.toString());
     params.set('sh', designOptions.shadowStrength.toString());
     params.set('so', designOptions.shadowOpacity.toString());
-    params.set('gr', designOptions.gradientLevel.toString());
+    params.set('gr', designOptions.gradients ? '1' : '0');
     params.set('rd', designOptions.radius.toString());
     
     const newUrl = `${window.location.pathname}?${params.toString()}`;
@@ -453,15 +457,18 @@ const App: React.FC = () => {
   };
 
   const updateOption = (key: keyof DesignOptions, value: number) => {
+    const nextValue = key === 'borderWidth'
+      ? Math.min(Math.max(value, 0), 2)
+      : value;
     setDesignOptions(prev => {
-      const next = { ...prev, [key]: value };
+      const next = { ...prev, [key]: nextValue };
       return next;
     });
 
     // If changing color generation params, regenerate
     if ((key === 'contrastLevel' || key === 'saturationLevel') && currentTheme) {
-      const newSat = key === 'saturationLevel' ? value : undefined;
-      const newCon = key === 'contrastLevel' ? value : undefined;
+      const newSat = key === 'saturationLevel' ? nextValue : undefined;
+      const newCon = key === 'contrastLevel' ? nextValue : undefined;
       generateNewTheme(currentTheme.mode, currentTheme.seed, newSat, newCon);
     }
   };
@@ -842,17 +849,21 @@ const App: React.FC = () => {
                  </button>
                  <label className="text-xs font-bold uppercase tracking-wider opacity-70">Border</label>
                </div>
-               <span className="text-xs font-mono opacity-50">{designOptions.borderWidth}px</span>
+               <span className="text-xs font-mono opacity-50">
+                 {designOptions.borderWidth === 0 ? 'None' : designOptions.borderWidth === 1 ? 'Thin' : 'Thick'}
+               </span>
              </div>
              <input 
-               type="range" min="0" max="5" step="1"
+               type="range" min="0" max="2" step="1"
                value={designOptions.borderWidth}
                onChange={(e) => updateOption('borderWidth', parseInt(e.target.value))}
                className="w-full h-1.5 bg-current opacity-20 rounded-lg appearance-none cursor-pointer accent-current"
                style={{ accentColor: shellTheme.primary }}
              />
-             <div className="flex justify-between text-[10px] opacity-40 px-0.5">
-               <span>None</span><span>Thick</span>
+             <div className="grid grid-cols-3 text-[10px] opacity-40 px-0.5">
+               <span>None</span>
+               <span className="text-center">Thin</span>
+               <span className="text-right">Thick</span>
              </div>
            </div>
 

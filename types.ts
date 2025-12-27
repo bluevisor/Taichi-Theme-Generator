@@ -41,7 +41,7 @@ export type GenerationMode = 'random' | 'monochrome' | 'analogous' | 'complement
 export type ColorFormat = 'hex' | 'rgb' | 'cmyk' | 'hsl' | 'lab' | 'lch' | 'oklch' | 'display-p3';
 
 export interface DesignOptions {
-  borderWidth: number;   // 0 - 5
+  borderWidth: number;   // 0 - 2 (none, thin, thick)
   shadowStrength: number; // 0 - 5 (Size)
   shadowOpacity: number; // 0 - 100 (%)
   gradients: boolean;    // Apply gradients to colored elements
