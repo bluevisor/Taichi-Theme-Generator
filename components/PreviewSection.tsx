@@ -207,9 +207,9 @@ const Tooltip: React.FC<{
   rClass: string;
 }> = ({ children, text, rClass }) => {
   return (
-    <div className="relative group inline-block">
+    <div className="relative group/tooltip inline-block">
       {children}
-      <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-t-text text-t-bg text-xs ${rClass} opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10`}>
+      <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-t-text text-t-bg text-xs ${rClass} opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10`}>
         {text}
         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-t-text" />
       </div>
@@ -465,24 +465,24 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options, onUpdateOp
         
         {/* Feature Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className={`${bClass} ${rClass} ${sClass} bg-t-card p-5 transition-all duration-300 hover:-translate-y-1 group`}>
-            <div className={`w-10 h-10 ${rClassInner} bg-t-primary/15 text-t-primary flex items-center justify-center mb-3 group-hover:bg-t-primary group-hover:text-t-textOnColor transition-colors`}>
+          <div className={`${bClass} ${rClass} ${sClass} bg-t-card p-5 transition-all duration-300 hover:-translate-y-1 group/card`}>
+            <div className={`w-10 h-10 ${rClassInner} bg-t-primary/15 text-t-primary flex items-center justify-center mb-3 group-hover/card:bg-t-primary group-hover/card:text-t-textOnColor transition-colors`}>
               <Palette size={20} />
             </div>
             <h4 className="font-bold text-t-text mb-1">1. OKLCH First</h4>
             <p className="text-sm text-t-textMuted">All color math happens in OKLCH — Lightness, Chroma, and Hue are computed separately for precision.</p>
           </div>
           
-          <div className={`${bClass} ${rClass} ${sClass} bg-t-card p-5 transition-all duration-300 hover:-translate-y-1 group`}>
-            <div className={`w-10 h-10 ${rClassInner} bg-t-secondary/15 text-t-secondary flex items-center justify-center mb-3 group-hover:bg-t-secondary group-hover:text-t-textOnColor transition-colors`}>
+          <div className={`${bClass} ${rClass} ${sClass} bg-t-card p-5 transition-all duration-300 hover:-translate-y-1 group/card`}>
+            <div className={`w-10 h-10 ${rClassInner} bg-t-secondary/15 text-t-secondary flex items-center justify-center mb-3 group-hover/card:bg-t-secondary group-hover/card:text-t-textOnColor transition-colors`}>
               <Sun size={20} />
             </div>
-            <h4 className="font-bold text-t-text mb-1">2. Light Mode First</h4>
-            <p className="text-sm text-t-textMuted">We generate the light theme first using neutral foundation targets, then derive dark mode deterministically.</p>
+            <h4 className="font-bold text-t-text mb-1">2. Deterministic</h4>
+            <p className="text-sm text-t-textMuted">One mode generates with full control, the other mode is derived mathematically for consistent pairing.</p>
           </div>
           
-          <div className={`${bClass} ${rClass} ${sClass} bg-t-card p-5 transition-all duration-300 hover:-translate-y-1 group`}>
-            <div className={`w-10 h-10 ${rClassInner} bg-t-accent/15 text-t-accent flex items-center justify-center mb-3 group-hover:bg-t-accent group-hover:text-t-textOnColor transition-colors`}>
+          <div className={`${bClass} ${rClass} ${sClass} bg-t-card p-5 transition-all duration-300 hover:-translate-y-1 group/card`}>
+            <div className={`w-10 h-10 ${rClassInner} bg-t-accent/15 text-t-accent flex items-center justify-center mb-3 group-hover/card:bg-t-accent group-hover/card:text-t-textOnColor transition-colors`}>
               <Shield size={20} />
             </div>
             <h4 className="font-bold text-t-text mb-1">3. Scored & Validated</h4>
@@ -669,12 +669,14 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options, onUpdateOp
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-t-text">Contrast Level</label>
+              <label className="text-sm font-medium text-t-text">Roundness</label>
               <select className={`w-full bg-t-card ${bClass} ${rPill} ${sClass} px-4 py-2.5 text-t-text transition-all duration-300
                 hover:border-t-primary/50
                 focus:outline-none focus:border-t-primary focus:ring-2 focus:ring-t-primary/20`}>
-                <option>AA (4.5:1)</option>
-                <option>AAA (7:1)</option>
+                <option>Square</option>
+                <option>Soft</option>
+                <option>Rounded</option>
+                <option>Pill</option>
               </select>
             </div>
           </div>
@@ -701,7 +703,7 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options, onUpdateOp
           </div>
 
           {/* Range Sliders - Connected to actual design options */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {onUpdateOption ? (
               <>
                 <ControlledSlider 
@@ -709,6 +711,13 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options, onUpdateOp
                   label="Saturation" 
                   value={options.saturationLevel}
                   onChange={(v) => onUpdateOption('saturationLevel', v)}
+                  min={-5} max={5}
+                />
+                <ControlledSlider 
+                  rClass={rClass} bClass={bClass} sClass={sClass} 
+                  label="Brightness" 
+                  value={options.brightnessLevel}
+                  onChange={(v) => onUpdateOption('brightnessLevel', v)}
                   min={-5} max={5}
                 />
                 <ControlledSlider 
@@ -721,8 +730,9 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options, onUpdateOp
               </>
             ) : (
               <>
-                <DemoSlider rClass={rClass} bClass={bClass} sClass={sClass} label="Saturation" defaultValue={65} />
-                <DemoSlider rClass={rClass} bClass={bClass} sClass={sClass} label="Contrast" defaultValue={80} />
+                <DemoSlider rClass={rClass} bClass={bClass} sClass={sClass} label="Saturation" defaultValue={50} />
+                <DemoSlider rClass={rClass} bClass={bClass} sClass={sClass} label="Brightness" defaultValue={50} />
+                <DemoSlider rClass={rClass} bClass={bClass} sClass={sClass} label="Contrast" defaultValue={50} />
               </>
             )}
           </div>
