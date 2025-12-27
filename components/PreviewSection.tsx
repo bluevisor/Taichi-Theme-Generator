@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Bell, Check, X, AlertTriangle, Info, Search, Menu, ChevronRight, ChevronDown,
-  Settings, User, Lock, Mail, Upload, Home, BarChart2, DollarSign, Star,
+  Settings, User, Lock, Unlock, Mail, Upload, Home, BarChart2, DollarSign, Star,
   Twitter, Github, Facebook, Layers, Eye, Palette, Sun, Moon, Zap, Shield,
   Code, BookOpen, ArrowRight, Clock, Heart, Share2, MessageCircle, Play,
   Download, ExternalLink, Copy, CheckCircle, XCircle, HelpCircle, Coffee
@@ -11,6 +11,7 @@ import { ThemeTokens, DesignOptions } from '../types';
 interface PreviewProps {
   themeName: string; // 'Light' or 'Dark'
   options: DesignOptions;
+  onUpdateOption?: (key: keyof DesignOptions, value: number | boolean) => void;
 }
 
 // Helper: Use the textOnColor token for text on colored backgrounds
@@ -54,28 +55,60 @@ const NavTabsDemo: React.FC<{
   );
 };
 
-// Volume Slider Component with working state
-const VolumeSlider: React.FC<{
+// Controlled Slider Component for design options
+const ControlledSlider: React.FC<{
+  rClass: string;
+  bClass: string;
+  sClass: string;
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  showPercent?: boolean;
+}> = ({ rClass, bClass, sClass, label, value, onChange, min = -5, max = 5, showPercent = false }) => {
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between">
+        <label className="text-sm font-medium text-t-text">{label}</label>
+        <span className="text-xs font-mono text-t-primary font-bold">
+          {showPercent ? `${value}%` : (value > 0 ? `+${value}` : value)}
+        </span>
+      </div>
+      <input 
+        type="range" 
+        min={min}
+        max={max}
+        value={value}
+        onChange={(e) => onChange(parseInt(e.target.value))}
+        className={`w-full h-2 bg-t-text/15 ${rClass} ${bClass} ${sClass} appearance-none cursor-pointer accent-t-primary transition-colors`} 
+      />
+    </div>
+  );
+};
+
+// Demo Slider Component with local state (for non-functional demo elements)
+const DemoSlider: React.FC<{
   rClass: string;
   bClass: string;
   sClass: string;
   label: string;
   defaultValue?: number;
-}> = ({ rClass, bClass, sClass, label, defaultValue = 69 }) => {
-  const [volume, setVolume] = useState(defaultValue);
+}> = ({ rClass, bClass, sClass, label, defaultValue = 50 }) => {
+  const [value, setValue] = useState(defaultValue);
   
   return (
     <div className="space-y-2">
       <div className="flex justify-between">
         <label className="text-sm font-medium text-t-text">{label}</label>
-        <span className="text-xs font-mono text-t-primary font-bold">{volume}%</span>
+        <span className="text-xs font-mono text-t-primary font-bold">{value}%</span>
       </div>
       <input 
         type="range" 
         min="0" 
         max="100" 
-        value={volume}
-        onChange={(e) => setVolume(parseInt(e.target.value))}
+        value={value}
+        onChange={(e) => setValue(parseInt(e.target.value))}
         className={`w-full h-2 bg-t-text/15 ${rClass} ${bClass} ${sClass} appearance-none cursor-pointer accent-t-primary transition-colors`} 
       />
     </div>
@@ -305,7 +338,7 @@ const HeroBanner: React.FC<{
   );
 };
 
-const PreviewSection: React.FC<PreviewProps> = ({ themeName, options }) => {
+const PreviewSection: React.FC<PreviewProps> = ({ themeName, options, onUpdateOption }) => {
   // --- Style Mappers ---
   const fgOnColor = getTextOnColor();
   
@@ -655,17 +688,43 @@ const PreviewSection: React.FC<PreviewProps> = ({ themeName, options }) => {
                   <span className="text-t-text group-hover:text-t-primary transition-colors">WCAG AA</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer group">
-                  <input type="checkbox" className={`w-4 h-4 accent-t-primary ${rClassInner} cursor-pointer`} />
+                  <input 
+                    type="checkbox" 
+                    className={`w-4 h-4 accent-t-primary ${rClassInner} cursor-pointer`} 
+                    checked={options.darkFirst}
+                    onChange={(e) => onUpdateOption?.('darkFirst', e.target.checked)}
+                  />
                   <span className="text-t-text group-hover:text-t-primary transition-colors">Dark First</span>
                 </label>
               </div>
             </div>
           </div>
 
-          {/* Range Sliders */}
+          {/* Range Sliders - Connected to actual design options */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <VolumeSlider rClass={rClass} bClass={bClass} sClass={sClass} label="Saturation" defaultValue={65} />
-            <VolumeSlider rClass={rClass} bClass={bClass} sClass={sClass} label="Contrast" defaultValue={80} />
+            {onUpdateOption ? (
+              <>
+                <ControlledSlider 
+                  rClass={rClass} bClass={bClass} sClass={sClass} 
+                  label="Saturation" 
+                  value={options.saturationLevel}
+                  onChange={(v) => onUpdateOption('saturationLevel', v)}
+                  min={-5} max={5}
+                />
+                <ControlledSlider 
+                  rClass={rClass} bClass={bClass} sClass={sClass} 
+                  label="Contrast" 
+                  value={options.contrastLevel}
+                  onChange={(v) => onUpdateOption('contrastLevel', v)}
+                  min={-5} max={5}
+                />
+              </>
+            ) : (
+              <>
+                <DemoSlider rClass={rClass} bClass={bClass} sClass={sClass} label="Saturation" defaultValue={65} />
+                <DemoSlider rClass={rClass} bClass={bClass} sClass={sClass} label="Contrast" defaultValue={80} />
+              </>
+            )}
           </div>
         </div>
       </section>

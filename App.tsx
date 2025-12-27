@@ -1125,7 +1125,7 @@ const App: React.FC = () => {
             className="w-full md:w-1/2 bg-t-bg transition-colors duration-500" 
             style={getStyleVars(currentTheme.light)}
           >
-             <PreviewSection themeName="Light" options={designOptions} />
+             <PreviewSection themeName="Light" options={designOptions} onUpdateOption={updateOption} />
           </div>
 
           {/* Dark Side */}
@@ -1133,7 +1133,7 @@ const App: React.FC = () => {
             className="w-full md:w-1/2 bg-t-bg transition-colors duration-500" 
             style={getStyleVars(currentTheme.dark)}
           >
-             <PreviewSection themeName="Dark" options={designOptions} />
+             <PreviewSection themeName="Dark" options={designOptions} onUpdateOption={updateOption} />
           </div>
         </div>
 
