@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Palette, RefreshCw, History, Upload, Image as ImageIcon, 
-  Trash2, Undo, Lock, ChevronLeft, ChevronRight, Share, Download,
+  Trash2, Undo, Lock, Unlock, ChevronLeft, ChevronRight, Share, Download,
   Moon, Sun, SlidersHorizontal, ChevronUp, ChevronDown, Shuffle, PanelTopClose, PanelTopOpen, X, Menu
 } from 'lucide-react';
-import { ThemeTokens, DualTheme, GenerationMode, ColorFormat, DesignOptions, LockedColors } from './types';
+import { ThemeTokens, DualTheme, GenerationMode, ColorFormat, DesignOptions, LockedColors, LockedOptions } from './types';
 import { generateTheme, extractPaletteFromImage, formatColor } from './utils/colorUtils';
 import PreviewSection from './components/PreviewSection';
 import SwatchStrip from './components/SwatchStrip';
@@ -100,6 +100,64 @@ const App: React.FC = () => {
   });
   
   const [lockedColors, setLockedColors] = useState<LockedColors>({});
+  const [lockedOptions, setLockedOptions] = useState<LockedOptions>({});
+
+  // Randomize unlocked design options
+  const randomizeDesignOptions = useCallback(() => {
+    setDesignOptions(prev => {
+      const next = { ...prev };
+      
+      // Border: 0-5
+      if (!lockedOptions.borderWidth) {
+        next.borderWidth = Math.floor(Math.random() * 6);
+      }
+      
+      // Shadow Strength: 0-5
+      if (!lockedOptions.shadowStrength) {
+        next.shadowStrength = Math.floor(Math.random() * 6);
+      }
+      
+      // Shadow Opacity: 5-95 (step 5)
+      if (!lockedOptions.shadowOpacity) {
+        next.shadowOpacity = 5 + Math.floor(Math.random() * 19) * 5;
+      }
+      
+      // Radius: 0-5
+      if (!lockedOptions.radius) {
+        next.radius = Math.floor(Math.random() * 6);
+      }
+      
+      // Gradient Level: 0-5
+      if (!lockedOptions.gradientLevel) {
+        next.gradientLevel = Math.floor(Math.random() * 6);
+      }
+      
+      // Saturation: -5 to 5
+      if (!lockedOptions.saturationLevel) {
+        next.saturationLevel = Math.floor(Math.random() * 11) - 5;
+      }
+      
+      // Brightness: -5 to 5
+      if (!lockedOptions.brightnessLevel) {
+        next.brightnessLevel = Math.floor(Math.random() * 11) - 5;
+      }
+      
+      // Contrast: -5 to 5
+      if (!lockedOptions.contrastLevel) {
+        next.contrastLevel = Math.floor(Math.random() * 11) - 5;
+      }
+      
+      return next;
+    });
+  }, [lockedOptions]);
+
+  // Toggle lock on a design option
+  const toggleOptionLock = useCallback((key: keyof DesignOptions) => {
+    setLockedOptions(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  }, []);
 
   // Initialize from URL or History
   useEffect(() => {
@@ -322,6 +380,9 @@ const App: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space' && (e.target as HTMLElement).tagName !== 'INPUT') {
         e.preventDefault();
+        // Randomize unlocked design options first
+        randomizeDesignOptions();
+        // Then generate new theme (will use the new options)
         generateNewTheme(mode);
       }
       if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
@@ -331,7 +392,7 @@ const App: React.FC = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mode, generateNewTheme]);
+  }, [mode, generateNewTheme, randomizeDesignOptions]);
 
   const undo = () => {
     // Go back in time (increment index)
@@ -444,7 +505,7 @@ const App: React.FC = () => {
           {/* Mobile: Generate + Palette + Options Buttons */}
           <div className="md:hidden flex items-center gap-2">
             <button 
-              onClick={() => generateNewTheme(mode)}
+              onClick={() => { randomizeDesignOptions(); generateNewTheme(mode); }}
               className="text-white rounded-lg font-medium shadow-md transition-all active:transform active:scale-95 flex items-center overflow-hidden"
               style={{ backgroundColor: shellTheme.primary, color: shellTheme.primaryFg }}
             >
@@ -487,7 +548,7 @@ const App: React.FC = () => {
 
             <div className="flex items-center gap-2 shrink-0">
               <button 
-                onClick={() => generateNewTheme(mode)}
+                onClick={() => { randomizeDesignOptions(); generateNewTheme(mode); }}
                 className="text-white rounded-md font-medium shadow-md transition-all active:transform active:scale-95 flex items-center overflow-hidden group"
                 style={{ backgroundColor: shellTheme.primary, color: shellTheme.primaryFg }}
               >
@@ -761,9 +822,18 @@ const App: React.FC = () => {
           style={{ backgroundColor: shellTheme.bg, borderColor: shellTheme.border }}
         >
            {/* Border Width */}
-           <div className="space-y-3">
+           <div className="space-y-2">
              <div className="flex justify-between items-center">
-               <label className="text-xs font-bold uppercase tracking-wider opacity-70">Border</label>
+               <div className="flex items-center gap-1.5">
+                 <button 
+                   onClick={() => toggleOptionLock('borderWidth')}
+                   className={`p-0.5 rounded transition-colors ${lockedOptions.borderWidth ? 'text-t-primary' : 'opacity-30 hover:opacity-60'}`}
+                   title={lockedOptions.borderWidth ? 'Unlock' : 'Lock'}
+                 >
+                   {lockedOptions.borderWidth ? <Lock size={10} /> : <Unlock size={10} />}
+                 </button>
+                 <label className="text-xs font-bold uppercase tracking-wider opacity-70">Border</label>
+               </div>
                <span className="text-xs font-mono opacity-50">{designOptions.borderWidth}px</span>
              </div>
              <input 
@@ -779,9 +849,18 @@ const App: React.FC = () => {
            </div>
 
            {/* Shadow Strength (Size) */}
-           <div className="space-y-3">
+           <div className="space-y-2">
              <div className="flex justify-between items-center">
-               <label className="text-xs font-bold uppercase tracking-wider opacity-70">Shadow Size</label>
+               <div className="flex items-center gap-1.5">
+                 <button 
+                   onClick={() => toggleOptionLock('shadowStrength')}
+                   className={`p-0.5 rounded transition-colors ${lockedOptions.shadowStrength ? 'text-t-primary' : 'opacity-30 hover:opacity-60'}`}
+                   title={lockedOptions.shadowStrength ? 'Unlock' : 'Lock'}
+                 >
+                   {lockedOptions.shadowStrength ? <Lock size={10} /> : <Unlock size={10} />}
+                 </button>
+                 <label className="text-xs font-bold uppercase tracking-wider opacity-70">Shadow</label>
+               </div>
                <span className="text-xs font-mono opacity-50">Lvl {designOptions.shadowStrength}</span>
              </div>
              <input 
@@ -797,9 +876,18 @@ const App: React.FC = () => {
            </div>
 
            {/* Shadow Opacity */}
-           <div className="space-y-3">
+           <div className="space-y-2">
              <div className="flex justify-between items-center">
-               <label className="text-xs font-bold uppercase tracking-wider opacity-70">Shadow Opacity</label>
+               <div className="flex items-center gap-1.5">
+                 <button 
+                   onClick={() => toggleOptionLock('shadowOpacity')}
+                   className={`p-0.5 rounded transition-colors ${lockedOptions.shadowOpacity ? 'text-t-primary' : 'opacity-30 hover:opacity-60'}`}
+                   title={lockedOptions.shadowOpacity ? 'Unlock' : 'Lock'}
+                 >
+                   {lockedOptions.shadowOpacity ? <Lock size={10} /> : <Unlock size={10} />}
+                 </button>
+                 <label className="text-xs font-bold uppercase tracking-wider opacity-70">Opacity</label>
+               </div>
                <span className="text-xs font-mono opacity-50">{designOptions.shadowOpacity}%</span>
              </div>
              <input 
@@ -815,9 +903,18 @@ const App: React.FC = () => {
            </div>
 
            {/* Corner Radius */}
-           <div className="space-y-3">
+           <div className="space-y-2">
              <div className="flex justify-between items-center">
-               <label className="text-xs font-bold uppercase tracking-wider opacity-70">Roundness</label>
+               <div className="flex items-center gap-1.5">
+                 <button 
+                   onClick={() => toggleOptionLock('radius')}
+                   className={`p-0.5 rounded transition-colors ${lockedOptions.radius ? 'text-t-primary' : 'opacity-30 hover:opacity-60'}`}
+                   title={lockedOptions.radius ? 'Unlock' : 'Lock'}
+                 >
+                   {lockedOptions.radius ? <Lock size={10} /> : <Unlock size={10} />}
+                 </button>
+                 <label className="text-xs font-bold uppercase tracking-wider opacity-70">Roundness</label>
+               </div>
                <span className="text-xs font-mono opacity-50">Lvl {designOptions.radius}</span>
              </div>
              <input 
@@ -833,9 +930,18 @@ const App: React.FC = () => {
            </div>
 
            {/* Gradient Level */}
-           <div className="space-y-3">
+           <div className="space-y-2">
              <div className="flex justify-between items-center">
-               <label className="text-xs font-bold uppercase tracking-wider opacity-70">Gradients</label>
+               <div className="flex items-center gap-1.5">
+                 <button 
+                   onClick={() => toggleOptionLock('gradientLevel')}
+                   className={`p-0.5 rounded transition-colors ${lockedOptions.gradientLevel ? 'text-t-primary' : 'opacity-30 hover:opacity-60'}`}
+                   title={lockedOptions.gradientLevel ? 'Unlock' : 'Lock'}
+                 >
+                   {lockedOptions.gradientLevel ? <Lock size={10} /> : <Unlock size={10} />}
+                 </button>
+                 <label className="text-xs font-bold uppercase tracking-wider opacity-70">Gradients</label>
+               </div>
                <span className="text-xs font-mono opacity-50">Lvl {designOptions.gradientLevel}</span>
              </div>
              <input 
@@ -850,10 +956,19 @@ const App: React.FC = () => {
              </div>
            </div>
 
-             {/* Saturation Level */}
-           <div className="space-y-3">
+           {/* Saturation Level */}
+           <div className="space-y-2">
              <div className="flex justify-between items-center">
-               <label className="text-xs font-bold uppercase tracking-wider opacity-70">Saturation</label>
+               <div className="flex items-center gap-1.5">
+                 <button 
+                   onClick={() => toggleOptionLock('saturationLevel')}
+                   className={`p-0.5 rounded transition-colors ${lockedOptions.saturationLevel ? 'text-t-primary' : 'opacity-30 hover:opacity-60'}`}
+                   title={lockedOptions.saturationLevel ? 'Unlock' : 'Lock'}
+                 >
+                   {lockedOptions.saturationLevel ? <Lock size={10} /> : <Unlock size={10} />}
+                 </button>
+                 <label className="text-xs font-bold uppercase tracking-wider opacity-70">Saturation</label>
+               </div>
                <span className="text-xs font-mono opacity-50">{designOptions.saturationLevel > 0 ? '+' : ''}{designOptions.saturationLevel}</span>
              </div>
              <input 
@@ -869,9 +984,18 @@ const App: React.FC = () => {
            </div>
 
            {/* Brightness Level */}
-           <div className="space-y-3">
+           <div className="space-y-2">
              <div className="flex justify-between items-center">
-               <label className="text-xs font-bold uppercase tracking-wider opacity-70">Brightness</label>
+               <div className="flex items-center gap-1.5">
+                 <button 
+                   onClick={() => toggleOptionLock('brightnessLevel')}
+                   className={`p-0.5 rounded transition-colors ${lockedOptions.brightnessLevel ? 'text-t-primary' : 'opacity-30 hover:opacity-60'}`}
+                   title={lockedOptions.brightnessLevel ? 'Unlock' : 'Lock'}
+                 >
+                   {lockedOptions.brightnessLevel ? <Lock size={10} /> : <Unlock size={10} />}
+                 </button>
+                 <label className="text-xs font-bold uppercase tracking-wider opacity-70">Brightness</label>
+               </div>
                <span className="text-xs font-mono opacity-50">{designOptions.brightnessLevel > 0 ? '+' : ''}{designOptions.brightnessLevel}</span>
              </div>
              <input 
@@ -887,21 +1011,30 @@ const App: React.FC = () => {
            </div>
 
            {/* Contrast Level */}
-           <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <label className="text-xs font-bold uppercase tracking-wider opacity-70">Contrast</label>
-                <span className="text-xs font-mono opacity-50">{designOptions.contrastLevel > 0 ? '+' : ''}{designOptions.contrastLevel}</span>
-              </div>
-              <input 
-                type="range" min="-5" max="5" step="1"
-                value={designOptions.contrastLevel}
-                onChange={(e) => updateOption('contrastLevel', parseInt(e.target.value))}
-                className="w-full h-1.5 bg-current opacity-20 rounded-lg appearance-none cursor-pointer accent-current"
-                style={{ accentColor: shellTheme.primary }}
-              />
-              <div className="flex justify-between text-[10px] opacity-40 px-0.5">
-                <span>Soft</span><span>Max</span>
-              </div>
+           <div className="space-y-2">
+             <div className="flex justify-between items-center">
+               <div className="flex items-center gap-1.5">
+                 <button 
+                   onClick={() => toggleOptionLock('contrastLevel')}
+                   className={`p-0.5 rounded transition-colors ${lockedOptions.contrastLevel ? 'text-t-primary' : 'opacity-30 hover:opacity-60'}`}
+                   title={lockedOptions.contrastLevel ? 'Unlock' : 'Lock'}
+                 >
+                   {lockedOptions.contrastLevel ? <Lock size={10} /> : <Unlock size={10} />}
+                 </button>
+                 <label className="text-xs font-bold uppercase tracking-wider opacity-70">Contrast</label>
+               </div>
+               <span className="text-xs font-mono opacity-50">{designOptions.contrastLevel > 0 ? '+' : ''}{designOptions.contrastLevel}</span>
+             </div>
+             <input 
+               type="range" min="-5" max="5" step="1"
+               value={designOptions.contrastLevel}
+               onChange={(e) => updateOption('contrastLevel', parseInt(e.target.value))}
+               className="w-full h-1.5 bg-current opacity-20 rounded-lg appearance-none cursor-pointer accent-current"
+               style={{ accentColor: shellTheme.primary }}
+             />
+             <div className="flex justify-between text-[10px] opacity-40 px-0.5">
+               <span>Soft</span><span>Max</span>
+             </div>
            </div>
         </div>
       )}

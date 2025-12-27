@@ -53,6 +53,8 @@ export interface DesignOptions {
 
 export type LockedColors = Partial<Record<keyof ThemeTokens, boolean>>;
 
+export type LockedOptions = Partial<Record<keyof DesignOptions, boolean>>;
+
 // --- OKLCH Palette Engine Types (v25.12.2) ---
 
 export interface OklchColor {
