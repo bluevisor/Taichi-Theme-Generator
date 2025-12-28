@@ -1136,23 +1136,44 @@ const PreviewSection: React.FC<PreviewProps> = ({
       </section>
 
       {/* Footer */}
-      <footer className="flex flex-col md:flex-row justify-between items-center gap-4 pt-6 border-t border-t-border text-sm text-t-textMuted">
-        <p>
-          Taichi Theme Generator © 2025 |{' '}
-          <a
-            href="https://www.bucaastudio.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-t-primary transition-colors"
-          >
-            Bucaa Studio
-          </a>
-          . All Rights Reserved. v25.12.2
-        </p>
-        <div className="flex items-center gap-4">
-          <a href="https://github.com/BucaaStudio/Taichi-Theme-Generator" target="_blank" rel="noopener noreferrer" className="hover:text-t-primary transition-colors">
-            <Github size={18} />
-          </a>
+      <footer className="flex flex-col gap-6 pt-10 pb-8 border-t border-t-border transition-colors duration-500">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <a 
+              href="https://www.producthunt.com/products/taichi-light-dark-theme-generator?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-taichi-light-dark-theme-generator" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block hover:opacity-90 transition-opacity"
+            >
+              <img 
+                alt="Taichi - Light & Dark Theme Generator - Generate perfectly matched Light & Dark UI themes | Product Hunt" 
+                width="160" 
+                height="35" 
+                src={`https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1055269&theme=${themeName === 'Dark' ? 'dark' : 'light'}&t=1735400000000`} 
+              />
+            </a>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <a href="https://github.com/BucaaStudio/Taichi-Theme-Generator" target="_blank" rel="noopener noreferrer" className="text-t-textMuted hover:text-t-primary transition-colors">
+              <Github size={20} />
+            </a>
+          </div>
+        </div>
+
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-t-textMuted">
+          <p>
+            Taichi Theme Generator © 2025 |{' '}
+            <a
+              href="https://www.bucaastudio.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-t-primary transition-colors"
+            >
+              Bucaa Studio
+            </a>
+            . All Rights Reserved. v25.12.2
+          </p>
         </div>
       </footer>
     </div>

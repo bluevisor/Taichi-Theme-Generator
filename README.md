@@ -9,6 +9,8 @@
 [![Vercel](https://img.shields.io/badge/deployed-vercel-black)](https://vercel.com)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
+<a href="https://www.producthunt.com/products/taichi-light-dark-theme-generator?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-taichi-light-dark-theme-generator" target="_blank" rel="noopener noreferrer"><img alt="Taichi - Light &amp; Dark Theme Generator - Generate perfectly matched Light &amp; Dark UI themes | Product Hunt" width="160" height="35" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1055269&amp;theme=light&amp;t=1766935885717"></a>
+
 </div>
 
 <div align="center">
@@ -27,7 +29,8 @@
   - Border width, shadow strength, roundness, and gradient controls
 - **Smart Color Formats** - Export in HEX, RGB, CMYK, HSL, LAB, LCH, OKLCH, or
   Display P3
-- **Image Color Extraction** - Generate palettes from uploaded images
+- **Image Color Extraction** - Replace the current palette with colors extracted
+  from an image
 - **History Management** - FIFO history with up to 20 saved themes
 - **Keyboard Shortcuts**
   - `Space` - Generate new theme
@@ -101,9 +104,17 @@ npm run preview
    - **Roundness**: 0 (square) to 5 (fully rounded)
    - **Shadows**: 0 (flat) to 5 (floating)
    - **Gradients**: 0 (solid) to 2 (vivid)
-3. **Press Space** or click "Generate" to create a new theme
+3. **Press Space** or click "Generate" to create a new theme, or use **Pick from
+   Image** to replace the palette with extracted colors
 4. **View the preview** - See your theme applied to both light and dark modes
    side-by-side
+
+### Image Palette Import
+
+1. Open **Pick from Image** and upload/paste a screenshot or photo
+2. Adjust the 5 slots and toggle which ones to include
+3. Click **Import Selection** to replace the theme palette (unchecked slots
+   regenerate)
 
 ### Color Palette Strip
 
