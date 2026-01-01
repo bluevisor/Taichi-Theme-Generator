@@ -1174,7 +1174,7 @@ const PreviewSection: React.FC<PreviewProps> = ({
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-t-textMuted">
           <p>
-            Taichi Theme Generator © 2025 |{' '}
+            Taichi Theme Generator © 2025 - 2026 |{' '}
             <a
               href="https://www.bucaastudio.com/"
               target="_blank"
